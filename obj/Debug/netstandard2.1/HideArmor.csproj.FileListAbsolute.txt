@@ -1,0 +1,10 @@
+c:\Users\furyg\Desktop\Dev\Self\Hide_Armor\obj\Debug\netstandard2.1\HideArmor.csproj.AssemblyReference.cache
+c:\Users\furyg\Desktop\Dev\Self\Hide_Armor\obj\Debug\netstandard2.1\HideArmor.GeneratedMSBuildEditorConfig.editorconfig
+c:\Users\furyg\Desktop\Dev\Self\Hide_Armor\obj\Debug\netstandard2.1\HideArmor.AssemblyInfoInputs.cache
+c:\Users\furyg\Desktop\Dev\Self\Hide_Armor\obj\Debug\netstandard2.1\HideArmor.AssemblyInfo.cs
+c:\Users\furyg\Desktop\Dev\Self\Hide_Armor\obj\Debug\netstandard2.1\HideArmor.csproj.CoreCompileInputs.cache
+c:\Users\furyg\Desktop\Dev\Self\Hide_Armor\bin\Debug\netstandard2.1\HideArmor.deps.json
+c:\Users\furyg\Desktop\Dev\Self\Hide_Armor\bin\Debug\netstandard2.1\HideArmor.dll
+c:\Users\furyg\Desktop\Dev\Self\Hide_Armor\bin\Debug\netstandard2.1\HideArmor.pdb
+c:\Users\furyg\Desktop\Dev\Self\Hide_Armor\obj\Debug\netstandard2.1\HideArmor.dll
+c:\Users\furyg\Desktop\Dev\Self\Hide_Armor\obj\Debug\netstandard2.1\HideArmor.pdb
