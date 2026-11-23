@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("HideArmor")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.1.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.1.0+1a57bf66471c99b0d9bfb9a62b87b2de9c3f427e")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.1.0+8c6eeba30ad3095a76a6a9a38bad82e1fc5a3737")]
 [assembly: System.Reflection.AssemblyProductAttribute("HideArmor")]
 [assembly: System.Reflection.AssemblyTitleAttribute("HideArmor")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.1.0.0")]

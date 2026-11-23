@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\furyg\\Desktop\\Dev\\Self\\Hide_Armor\\HideArmor.csproj": {}
+    "c:\\Users\\furyg\\Desktop\\Dev\\Self\\Hide_Armor\\HideArmor.csproj": {}
   },
   "projects": {
-    "C:\\Users\\furyg\\Desktop\\Dev\\Self\\Hide_Armor\\HideArmor.csproj": {
+    "c:\\Users\\furyg\\Desktop\\Dev\\Self\\Hide_Armor\\HideArmor.csproj": {
       "version": "1.1.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\furyg\\Desktop\\Dev\\Self\\Hide_Armor\\HideArmor.csproj",
+        "projectUniqueName": "c:\\Users\\furyg\\Desktop\\Dev\\Self\\Hide_Armor\\HideArmor.csproj",
         "projectName": "HideArmor",
-        "projectPath": "C:\\Users\\furyg\\Desktop\\Dev\\Self\\Hide_Armor\\HideArmor.csproj",
+        "projectPath": "c:\\Users\\furyg\\Desktop\\Dev\\Self\\Hide_Armor\\HideArmor.csproj",
         "packagesPath": "C:\\Users\\furyg\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\furyg\\Desktop\\Dev\\Self\\Hide_Armor\\obj\\",
+        "outputPath": "c:\\Users\\furyg\\Desktop\\Dev\\Self\\Hide_Armor\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\furyg\\AppData\\Roaming\\NuGet\\NuGet.Config"

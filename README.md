@@ -9,6 +9,13 @@ Show off your tactical clothing, faction jackets, and shirts without bulky armor
 ## Features
 
 - **Purely Visual**: Disables mesh renderers on equipped armor. Armor stats, ballistics, plate inserts, durability, and hit registration remain completely untouched and fully functional.
+- **Hide by Name or ID**: Target specific armor pieces by their in-game name, short name, or MongoDB template ID.
+- **Individual Overrides**: Select an item by name or ID and choose its option (`AlwaysHide`, `AlwaysShow`, or `Default`).
+- **Filter Modes**:
+  - `UseSlotRules`: Standard behavior based on slot checkboxes, with custom overrides applied.
+  - `WhitelistOnly`: ONLY hide items matching your specified names/IDs.
+  - `Blacklist`: Hide all items matching slot checkboxes, EXCEPT those in your visible list.
+- **Auto-Logging for Discovery**: When you equip any item in the menu or raid, its exact Name, ShortName, and Template ID are printed to the BepInEx log for easy copy-pasting into your config.
 - **Granular Slot Configuration**:
   - **Body Armor**: Hide body armor vests (Slick, Korund, PACA, Trooper, etc.).
   - **Tactical Chest Rigs**: Hide chest rigs *only* if they provide armor (AVS, TV-110, CPC, Thor CR, etc.), or optionally hide all chest rigs.
@@ -62,6 +69,20 @@ Press **F12** in-game to open the BepInEx Configuration Manager, or edit `BepInE
 | **Hide Earpieces (Headsets)** | `false` | Hide headsets and earpieces in the `Earpiece` slot. |
 | **Hide Armbands** | `false` | Hide armbands. |
 | **Hide Holsters** | `false` | Hide sidearm holsters. |
+
+### 3. Name & ID Filtering
+| Setting | Default | Description |
+|---|---|---|
+| **Filter Mode** | `UseSlotRules` | `UseSlotRules`, `WhitelistOnly`, or `Blacklist`. |
+| **Items To Hide (List)** | `""` | Comma-separated names, short names, or template IDs to always hide (e.g. `slick, altyn, 5b47574386f77428ca22b2f4`). |
+| **Items To Keep Visible (List)** | `""` | Comma-separated names, short names, or template IDs to never hide (e.g. `paca, untar`). |
+| **Log Equipped Item Info** | `true` | Prints equipped item Name, ShortName, and ID to BepInEx log for easy copy-pasting. |
+
+### 4. Individual Item Overrides
+You can define individual item slots with a dedicated action dropdown:
+- **`Item 1: Name or ID`**: Target name or ID (e.g. `slick`)
+- **`Item 1: Option`**: `Default`, `AlwaysHide`, or `AlwaysShow`
+*(Provides slots 1 through 5 in the F12 menu)*
 
 ---
 
