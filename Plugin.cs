@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace HideArmor
 {
-    [BepInPlugin("com.furyg.hidearmor", "Hide Armor", "1.0.0")]
+    [BepInPlugin("com.furyg.hidearmor", "Hide Armor", "1.1.0")]
     public class HideArmorPlugin : BaseUnityPlugin
     {
         public static HideArmorPlugin Instance { get; private set; }
@@ -34,6 +34,7 @@ namespace HideArmor
         public static ConfigEntry<bool> HideEyewear { get; private set; }
         public static ConfigEntry<bool> HideArmBands { get; private set; }
         public static ConfigEntry<bool> HideHolsters { get; private set; }
+        public static ConfigEntry<bool> HideEarpieces { get; private set; }
 
         private static readonly FieldInfo IsYourPlayerField = typeof(PlayerBody).GetField("_isYourPlayer", BindingFlags.Instance | BindingFlags.NonPublic);
 
@@ -76,6 +77,7 @@ namespace HideArmor
             HideEyewear = Config.Bind(secSlots, "Hide Eyewear", false, "Hide glasses and goggles in the Eyewear slot.");
             HideArmBands = Config.Bind(secSlots, "Hide Armbands", false, "Hide armbands in the ArmBand slot.");
             HideHolsters = Config.Bind(secSlots, "Hide Holsters", false, "Hide sidearm holsters in the Holster slot.");
+            HideEarpieces = Config.Bind(secSlots, "Hide Earpieces (Headsets)", false, "Hide headsets and earpieces in the Earpiece slot (e.g. ComTac 2, Sordin, Razor).");
 
             // Register setting change listeners to apply changes immediately
             ModEnabled.SettingChanged += OnConfigChanged;
@@ -92,6 +94,7 @@ namespace HideArmor
             HideEyewear.SettingChanged += OnConfigChanged;
             HideArmBands.SettingChanged += OnConfigChanged;
             HideHolsters.SettingChanged += OnConfigChanged;
+            HideEarpieces.SettingChanged += OnConfigChanged;
         }
 
         private void OnConfigChanged(object sender, EventArgs e)
@@ -211,6 +214,9 @@ namespace HideArmor
 
                 case EquipmentSlot.Holster:
                     return HideHolsters.Value;
+
+                case EquipmentSlot.Earpiece:
+                    return HideEarpieces.Value;
 
                 default:
                     return false;

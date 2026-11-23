@@ -14,7 +14,7 @@ Show off your tactical clothing, faction jackets, and shirts without bulky armor
   - **Tactical Chest Rigs**: Hide chest rigs *only* if they provide armor (AVS, TV-110, CPC, Thor CR, etc.), or optionally hide all chest rigs.
   - **Headwear / Helmets**: Optionally hide armored helmets (Altyn, Fast MT, Team Wendy, etc.) or non-armored hats/caps.
   - **Backpacks**: Optionally hide backpacks.
-  - **Face Covers, Eyewear, Armbands, Holsters**: Fully configurable toggles for every slot.
+  - **Face Covers, Eyewear, Earpieces, Armbands, Holsters**: Fully configurable toggles for every slot.
 - **Target Selection**:
   - **Local Player**: Hides armor on your character in-raid (both 1st-person and 3rd-person).
   - **Menu / Inventory**: Hides armor in the character inspect screen and main menu.
@@ -59,6 +59,7 @@ Press **F12** in-game to open the BepInEx Configuration Manager, or edit `BepInE
 | **Hide Backpacks** | `false` | Hide backpacks in the `Backpack` slot. |
 | **Hide Face Covers** | `false` | Hide balaclavas, masks, and shemaghs. |
 | **Hide Eyewear** | `false` | Hide glasses and goggles. |
+| **Hide Earpieces (Headsets)** | `false` | Hide headsets and earpieces in the `Earpiece` slot. |
 | **Hide Armbands** | `false` | Hide armbands. |
 | **Hide Holsters** | `false` | Hide sidearm holsters. |
 

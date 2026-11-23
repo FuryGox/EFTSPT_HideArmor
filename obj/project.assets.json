@@ -11,13 +11,13 @@
     "C:\\Users\\furyg\\.nuget\\packages\\": {}
   },
   "project": {
-    "version": "1.0.0",
+    "version": "1.1.0",
     "restore": {
-      "projectUniqueName": "c:\\Users\\furyg\\Desktop\\Dev\\Self\\Hide_Armor\\HideArmor.csproj",
+      "projectUniqueName": "C:\\Users\\furyg\\Desktop\\Dev\\Self\\Hide_Armor\\HideArmor.csproj",
       "projectName": "HideArmor",
-      "projectPath": "c:\\Users\\furyg\\Desktop\\Dev\\Self\\Hide_Armor\\HideArmor.csproj",
+      "projectPath": "C:\\Users\\furyg\\Desktop\\Dev\\Self\\Hide_Armor\\HideArmor.csproj",
       "packagesPath": "C:\\Users\\furyg\\.nuget\\packages\\",
-      "outputPath": "c:\\Users\\furyg\\Desktop\\Dev\\Self\\Hide_Armor\\obj\\",
+      "outputPath": "C:\\Users\\furyg\\Desktop\\Dev\\Self\\Hide_Armor\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\furyg\\AppData\\Roaming\\NuGet\\NuGet.Config"

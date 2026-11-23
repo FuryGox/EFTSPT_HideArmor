@@ -8,3 +8,4 @@ c:\Users\furyg\Desktop\Dev\Self\Hide_Armor\obj\Release\netstandard2.1\HideArmor.
 c:\Users\furyg\Desktop\Dev\Self\Hide_Armor\obj\Release\netstandard2.1\HideArmor.csproj.CoreCompileInputs.cache
 c:\Users\furyg\Desktop\Dev\Self\Hide_Armor\obj\Release\netstandard2.1\HideArmor.dll
 c:\Users\furyg\Desktop\Dev\Self\Hide_Armor\obj\Release\netstandard2.1\HideArmor.pdb
+c:\Users\furyg\Desktop\Dev\Self\Hide_Armor\obj\Release\netstandard2.1\HideArmor.sourcelink.json
