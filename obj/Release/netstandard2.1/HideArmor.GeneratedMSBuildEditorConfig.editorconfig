@@ -1,6 +1,6 @@
 is_global = true
 build_property.RootNamespace = HideArmor
-build_property.ProjectDir = c:\Users\furyg\Desktop\Dev\Self\Hide_Armor\
+build_property.ProjectDir = C:\Users\furyg\Desktop\Dev\Self\Hide_Armor\
 build_property.EnableComHosting = 
 build_property.EnableGeneratedComInterfaceComImportInterop = 
 build_property.CsWinRTUseWindowsUIXamlProjections = false

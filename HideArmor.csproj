@@ -4,7 +4,7 @@
     <TargetFramework>netstandard2.1</TargetFramework>
     <AssemblyName>HideArmor</AssemblyName>
     <RootNamespace>HideArmor</RootNamespace>
-    <Version>1.1.0</Version>
+    <Version>1.2.0</Version>
     <LangVersion>latest</LangVersion>
     <Nullable>disable</Nullable>
     <EftGameDir>J:\SteamLibrary\steamapps\common\Escape from Tarkov</EftGameDir>
@@ -27,6 +27,10 @@
       <HintPath>$(EftGameDir)\EscapeFromTarkov_Data\Managed\ItemComponent.Types.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>$(EftGameDir)\EscapeFromTarkov_Data\Managed\Newtonsoft.Json.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="UnityEngine">
       <HintPath>$(EftGameDir)\EscapeFromTarkov_Data\Managed\UnityEngine.dll</HintPath>
       <Private>False</Private>
@@ -37,6 +41,10 @@
     </Reference>
     <Reference Include="Comfort">
       <HintPath>$(EftGameDir)\EscapeFromTarkov_Data\Managed\Comfort.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Sirenix.Serialization">
+      <HintPath>$(EftGameDir)\EscapeFromTarkov_Data\Managed\Sirenix.Serialization.dll</HintPath>
       <Private>False</Private>
     </Reference>
   </ItemGroup>

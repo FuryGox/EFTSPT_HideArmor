@@ -6,101 +6,82 @@ Show off your tactical clothing, faction jackets, and shirts without bulky armor
 
 ---
 
-## Features
+## Features & Mechanics
 
-- **Purely Visual**: Disables mesh renderers on equipped armor. Armor stats, ballistics, plate inserts, durability, and hit registration remain completely untouched and fully functional.
-- **Hide by Name or ID**: Target specific armor pieces by their in-game name, short name, or MongoDB template ID.
-- **Individual Overrides**: Select an item by name or ID and choose its option (`AlwaysHide`, `AlwaysShow`, or `Default`).
-- **Filter Modes**:
-  - `UseSlotRules`: Standard behavior based on slot checkboxes, with custom overrides applied.
-  - `WhitelistOnly`: ONLY hide items matching your specified names/IDs.
-  - `Blacklist`: Hide all items matching slot checkboxes, EXCEPT those in your visible list.
-- **Auto-Logging for Discovery**: When you equip any item in the menu or raid, its exact Name, ShortName, and Template ID are printed to the BepInEx log for easy copy-pasting into your config.
-- **Granular Slot Configuration**:
-  - **Body Armor**: Hide body armor vests (Slick, Korund, PACA, Trooper, etc.).
-  - **Tactical Chest Rigs**: Hide chest rigs *only* if they provide armor (AVS, TV-110, CPC, Thor CR, etc.), or optionally hide all chest rigs.
-  - **Headwear / Helmets**: Optionally hide armored helmets (Altyn, Fast MT, Team Wendy, etc.) or non-armored hats/caps.
-  - **Backpacks**: Optionally hide backpacks.
-  - **Face Covers, Eyewear, Earpieces, Armbands, Holsters**: Fully configurable toggles for every slot.
-- **Target Selection**:
-  - **Local Player**: Hides armor on your character in-raid (both 1st-person and 3rd-person).
-  - **Menu / Inventory**: Hides armor in the character inspect screen and main menu.
-  - **AI Bots**: Option to hide armor on AI Scavs, PMCs, and Bosses (disabled by default so enemies still look armored).
-- **Real-Time Dynamic Updates**: Change any setting in the **F12 BepInEx Configuration Manager** menu in-game, and changes take effect immediately without restarting or leaving raid.
-- **Hotkey Toggle**: Optional configurable hotkey to toggle armor hiding on the fly.
+1. **Current Player**:
+   - The current player (local human player in raid and in main menu / stash preview) **always uses the settings in Section 2: `Equipment Slots (Current Player)`**.
+   - Supports: Body Armor (`ArmorVest`), Chest Rigs (`TacticalVest` - armored or unarmored), Helmets (`Headwear`), Backpacks (`Backpack`), Face Covers (`FaceCover`), Eyewear (`Eyewear`), Headsets (`Earpiece`), Armbands (`ArmBand`), and Holsters (`Holster`).
+2. **Character Selection & Dedicated Character Config**:
+   - **`Character List`**: Comma-separated list of names or IDs to configure (e.g. `Killa, Tagilla, Reshala, Glukhar, Sanitar, Knight, Birdeye, Big Pipe`).
+   - **`Selected Character`**: A dropdown **option select** resolved directly from `Character List`.
+   - **`4. Selected Character Config`**: A dedicated section displaying all slot options for the currently selected character.
+   - When you switch the character in `Selected Character`, the mod automatically saves the previous character's profile and loads the new character's options into the UI in real time.
+   - Per-character profiles are persisted to: `BepInEx\config\HideArmor_Characters.json`.
+3. **Real-Time Live Updates**:
+   - All changes in the in-game **F12 BepInEx Configuration Manager** take effect immediately without restarting the game or leaving raid.
+4. **100% Armor Mechanics Intact**:
+   - Ballistic plates, penetration calculation, durability degradation, and hit registration function identically to vanilla EFT.
 
 ---
 
-## Installation
+## In-Game Configuration (F12)
 
-The compiled mod has already been built and installed into your SPT game directory:
-`J:\SteamLibrary\steamapps\common\Escape from Tarkov\BepInEx\plugins\HideArmor\HideArmor.dll`
-
-If you ever need to manually install or share it:
-1. Copy the `HideArmor` folder (containing `HideArmor.dll`) into `<SPT_Root>\BepInEx\plugins\`.
-2. Launch SPT as usual.
-
----
-
-## Configuration
-
-Press **F12** in-game to open the BepInEx Configuration Manager, or edit `BepInEx\config\com.furyg.hidearmor.cfg`:
+Press **F12** in-game to open the BepInEx Configuration Manager:
 
 ### 1. General Settings
 | Setting | Default | Description |
 |---|---|---|
 | **Enabled** | `true` | Master toggle to enable/disable the mod. |
-| **Toggle Hotkey** | `None` | Keybind to toggle armor visibility on the fly in-raid. |
-| **Hide For Local Player** | `true` | Hide armor on your character in-raid. |
-| **Hide In Menu / Inventory** | `true` | Hide armor in the main menu and inventory inspect screen. |
-| **Hide For Bots** | `false` | Hide armor on AI bots (Scavs, PMCs, Bosses). |
+| **Toggle Hotkey** | `None` | Optional hotkey to toggle armor hiding in-raid. |
+| **Hide For Local Player** | `true` | Enable armor hiding on your character in-raid (uses Section 2). |
+| **Hide In Menu / Inventory** | `true` | Enable armor hiding on your character in menu/stash (uses Section 2). |
+| **Hide For Other Bots (Not In List)** | `false` | Hide armor on other AI bots not specified in the Character List. |
+| **Log Character Info** | `true` | Print Nickname, Profile ID, and Account ID to BepInEx log when loaded. |
 
-### 2. Equipment Slots
+### 2. Equipment Slots (Current Player)
+*(Applies exclusively to your own character)*
 | Setting | Default | Description |
 |---|---|---|
-| **Hide Armor Vest** | `true` | Hide body armor vests in the `ArmorVest` slot. |
-| **Hide Armored Chest Rigs** | `true` | Hide tactical chest rigs in the `TacticalVest` slot ONLY if armored. |
-| **Hide Non-Armored Chest Rigs** | `false` | Hide unarmored chest rigs in the `TacticalVest` slot. |
-| **Hide Armored Headwear (Helmets)** | `false` | Hide armored helmets in the `Headwear` slot. |
-| **Hide Non-Armored Headwear** | `false` | Hide baseball caps, beanies, berets, etc. |
-| **Hide Backpacks** | `false` | Hide backpacks in the `Backpack` slot. |
+| **Hide Armor Vest** | `true` | Hide body armor vests (Slick, Korund, PACA, Trooper, etc.). |
+| **Hide Armored Chest Rigs** | `true` | Hide tactical chest rigs **only if armored** (AVS, TV-110, CPC, Thor CR). |
+| **Hide Non-Armored Chest Rigs** | `false` | Hide unarmored chest rigs (Bank Robber, Triton, Blackrock, etc.). |
+| **Hide Armored Headwear (Helmets)** | `false` | Hide armored helmets (Altyn, Fast MT, Team Wendy, etc.). |
+| **Hide Non-Armored Headwear** | `false` | Hide caps, beanies, berets, etc. |
+| **Hide Backpacks** | `false` | Hide backpacks. |
 | **Hide Face Covers** | `false` | Hide balaclavas, masks, and shemaghs. |
 | **Hide Eyewear** | `false` | Hide glasses and goggles. |
-| **Hide Earpieces (Headsets)** | `false` | Hide headsets and earpieces in the `Earpiece` slot. |
+| **Hide Earpieces (Headsets)** | `false` | Hide headsets and earpieces (ComTac 2, Sordin, Razor). |
 | **Hide Armbands** | `false` | Hide armbands. |
 | **Hide Holsters** | `false` | Hide sidearm holsters. |
 
-### 3. Name & ID Filtering
-| Setting | Default | Description |
-|---|---|---|
-| **Filter Mode** | `UseSlotRules` | `UseSlotRules`, `WhitelistOnly`, or `Blacklist`. |
-| **Items To Hide (List)** | `""` | Comma-separated names, short names, or template IDs to always hide (e.g. `slick, altyn, 5b47574386f77428ca22b2f4`). |
-| **Items To Keep Visible (List)** | `""` | Comma-separated names, short names, or template IDs to never hide (e.g. `paca, untar`). |
-| **Log Equipped Item Info** | `true` | Prints equipped item Name, ShortName, and ID to BepInEx log for easy copy-pasting. |
+### 3. Character Selection
+- **`Character List`**: Comma-separated list of characters, bots, or bosses to configure (defaults to empty/null). Leave empty to disable per-character overrides.
+- **`Selected Character`**: Dropdown select resolved from `Character List`. **Automatically hidden if `Character List` is null or empty.**
 
-### 4. Individual Item Overrides
-You can define individual item slots with a dedicated action dropdown:
-- **`Item 1: Name or ID`**: Target name or ID (e.g. `slick`)
-- **`Item 1: Option`**: `Default`, `AlwaysHide`, or `AlwaysShow`
-*(Provides slots 1 through 5 in the F12 menu)*
-
----
-
-## How It Works
-
-Escape from Tarkov structures equipment models as child GameObjects under character bones with a dedicated `SlotView` for each inventory slot. 
-
-1. **Rendering**: The mod patches `PlayerBody.SlotView.CreateAndParent` and `PlayerBody.UpdatePlayerRenders`. When an armor piece or rig is equipped, it disables the Unity `Renderer.enabled` property for that slot's mesh renderers, skinned dress renderers, and child plates/attachments.
-2. **Underlying Clothing**: Unlike some games that cull the player model under armor, EFT keeps the torso clothing (`BodySkins`) active underneath body armor and rigs. With renderers disabled on the armor, the player's PMC clothing is seamlessly visible.
-3. **Ballistics & Protection**: EFT calculates ballistic collision, hit registration, plate degradation, and damage reduction using server/client item data, colliders, and `ArmorComponent` logic — completely independent of Unity mesh renderers. You retain 100% protection.
+### 4. Selected Character Config
+*(Dedicated options for the character selected in Section 3. **Automatically hidden if `Character List` is null or empty.**)*
+- **`Custom Hiding Enabled`**: Toggle custom hiding for this character.
+- **`Hide Armor Vest`**: Hide body armor vest.
+- **`Hide Armored Chest Rigs`**: Hide armored chest rigs.
+- **`Hide Non-Armored Chest Rigs`**: Hide unarmored chest rigs.
+- **`Hide Armored Headwear (Helmets)`**: Hide helmets.
+- **`Hide Non-Armored Headwear`**: Hide caps, beanies, etc.
+- **`Hide Backpacks`**: Hide backpacks.
+- **`Hide Face Covers`**: Hide masks/face covers.
+- **`Hide Eyewear`**: Hide eyewear.
+- **`Hide Earpieces (Headsets)`**: Hide headsets.
+- **`Hide Armbands`**: Hide armbands.
+- **`Hide Holsters`**: Hide holsters.
 
 ---
 
-## Building from Source
+## Installation & Building
 
-To rebuild the mod:
+The compiled mod has been built and deployed to:
+`J:\SteamLibrary\steamapps\common\Escape from Tarkov\BepInEx\plugins\HideArmor\HideArmor.dll`
+
+To rebuild from source:
 ```powershell
 cd "c:\Users\furyg\Desktop\Dev\Self\Hide_Armor"
 dotnet build -c Release
 ```
-The post-build step will automatically copy the updated `HideArmor.dll` to your SPT BepInEx plugins folder.

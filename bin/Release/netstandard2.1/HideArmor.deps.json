@@ -7,7 +7,7 @@
   "targets": {
     ".NETStandard,Version=v2.1": {},
     ".NETStandard,Version=v2.1/": {
-      "HideArmor/1.1.0": {
+      "HideArmor/1.2.0": {
         "runtime": {
           "HideArmor.dll": {}
         }
@@ -15,7 +15,7 @@
     }
   },
   "libraries": {
-    "HideArmor/1.1.0": {
+    "HideArmor/1.2.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
