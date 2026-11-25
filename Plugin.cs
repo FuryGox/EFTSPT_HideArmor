@@ -58,6 +58,15 @@ namespace HideArmor
         public static ConfigEntry<bool> HideInMenu { get; private set; }
         public static ConfigEntry<bool> HideForBots { get; private set; }
         public static ConfigEntry<bool> LogUserInfo { get; private set; }
+        public static ConfigEntry<bool> DebugLog { get; private set; }
+
+        public static void LogDebug(string message)
+        {
+            if (DebugLog != null && DebugLog.Value)
+            {
+                Log?.LogInfo($"[HideArmor DEBUG] {message}");
+            }
+        }
 
         // Section 2 - Equipment Slots (Current Player)
         public static ConfigEntry<bool> HideArmorVest { get; private set; }
@@ -200,6 +209,7 @@ namespace HideArmor
             HideInMenu = Config.Bind(secGeneral, "Hide In Menu / Inventory", true, "Apply armor hiding to your character model in main menu / stash inspect (uses Section 2 Equipment Slots).");
             HideForBots = Config.Bind(secGeneral, "Hide For Other Bots (Not In List)", false, "Hide armor on other AI bots not specified in the Character List (default: false).");
             LogUserInfo = Config.Bind(secGeneral, "Log Character Info", true, "When any character/bot spawns, print its exact Nickname, Profile ID, and Account ID to the BepInEx console.");
+            DebugLog = Config.Bind(secGeneral, "Debug Logging", false, "Print detailed step-by-step diagnostic logs in the BepInEx console to help troubleshoot hiding issues.");
 
             // Section 2: Equipment Slots (Current Player)
             const string secPlayerSlots = "2. Equipment Slots (Current Player)";
@@ -316,6 +326,7 @@ namespace HideArmor
 
         private void OnGeneralConfigChanged(object sender, EventArgs e)
         {
+            LogDebug($"General/Player equipment config changed by '{sender}'");
             ApplyToAllActiveBodies();
         }
 
@@ -323,6 +334,7 @@ namespace HideArmor
         {
             if (_isLoadingCharacterConfig) return;
 
+            LogDebug($"CharacterList changed to: '{CharacterList?.Value}'");
             string[] names = ParseCharacterNames(CharacterList?.Value);
             bool hasCharacters = names.Length > 0;
             UpdateCharacterConfigVisibility(hasCharacters);
@@ -416,6 +428,8 @@ namespace HideArmor
             string newChar = SelectedCharacter.Value?.Trim();
             if (string.IsNullOrEmpty(newChar)) return;
 
+            LogDebug($"SelectedCharacter changed to: '{newChar}'");
+
             if (!string.IsNullOrEmpty(_lastSelectedCharacter))
             {
                 SaveCurrentUIOptionsToProfile(_lastSelectedCharacter);
@@ -434,6 +448,8 @@ namespace HideArmor
 
             string currentChar = SelectedCharacter.Value?.Trim();
             if (string.IsNullOrEmpty(currentChar)) return;
+
+            LogDebug($"SelectedChar option changed for '{currentChar}'");
 
             SaveCurrentUIOptionsToProfile(currentChar);
             SaveProfilesToFile();
@@ -609,6 +625,7 @@ namespace HideArmor
                 {
                     if (CharacterProfiles.TryGetValue(name, out var config))
                     {
+                        LogDebug($"FindCharacterConfig: MATCH found (Exact match '{name}' for Nick='{nickname}', ProfileId='{profileId}')");
                         return config;
                     }
                 }
@@ -622,6 +639,7 @@ namespace HideArmor
                 {
                     if (CharacterProfiles.TryGetValue(name, out var config))
                     {
+                        LogDebug($"FindCharacterConfig: MATCH found (Boss alias match '{name}' for Nick='{nickname}')");
                         return config;
                     }
                 }
@@ -645,11 +663,13 @@ namespace HideArmor
                 {
                     if (CharacterProfiles.TryGetValue(name, out var config))
                     {
+                        LogDebug($"FindCharacterConfig: MATCH found (Substring match '{name}' for Nick='{nickname}', ProfileId='{profileId}')");
                         return config;
                     }
                 }
             }
 
+            LogDebug($"FindCharacterConfig: No profile match for Nick='{nickname}', ProfileId='{profileId}', AccountId='{accountId}'");
             return null;
         }
 
@@ -686,10 +706,16 @@ namespace HideArmor
 
             // 1. Menu / Stash preview character model
             if (playerBody.GetComponentInParent<MenuPlayerPoser>() != null || playerBody.GetComponent<MenuPlayerPoser>() != null)
+            {
+                LogDebug($"CheckIsCurrentPlayer: TRUE (matched MenuPlayerPoser on '{playerBody.name}')");
                 return true;
+            }
 
             if (playerBody.GetComponentInParent<EFT.UI.PlayerModelView>() != null || playerBody.GetComponent<EFT.UI.PlayerModelView>() != null)
+            {
+                LogDebug($"CheckIsCurrentPlayer: TRUE (matched PlayerModelView on '{playerBody.name}')");
                 return true;
+            }
 
             // 2. In-raid GameWorld local MainPlayer
             try
@@ -699,15 +725,18 @@ namespace HideArmor
                     var mainPlayer = Comfort.Common.Singleton<GameWorld>.Instance?.MainPlayer;
                     if (mainPlayer != null)
                     {
-                        if (mainPlayer.PlayerBody == playerBody)
+                        if (mainPlayer.PlayerBody == playerBody || mainPlayer.gameObject == playerBody.gameObject)
+                        {
+                            LogDebug($"CheckIsCurrentPlayer: TRUE (matched GameWorld.MainPlayer on '{playerBody.name}')");
                             return true;
-
-                        if (mainPlayer.gameObject == playerBody.gameObject)
-                            return true;
+                        }
 
                         var pbInMain = mainPlayer.GetComponentInChildren<PlayerBody>();
                         if (pbInMain == playerBody)
+                        {
+                            LogDebug($"CheckIsCurrentPlayer: TRUE (matched MainPlayer child PlayerBody on '{playerBody.name}')");
                             return true;
+                        }
                     }
                 }
             }
@@ -716,7 +745,10 @@ namespace HideArmor
             // 3. Player component on self or parent
             var player = playerBody.GetComponentInParent<Player>() ?? playerBody.GetComponent<Player>();
             if (player != null && player.IsYourPlayer)
+            {
+                LogDebug($"CheckIsCurrentPlayer: TRUE (matched Player.IsYourPlayer for '{player.Profile?.Nickname}')");
                 return true;
+            }
 
             // 4. Private _isYourPlayer field on PlayerBody
             if (IsYourPlayerField != null)
@@ -724,7 +756,10 @@ namespace HideArmor
                 try
                 {
                     if ((bool)IsYourPlayerField.GetValue(playerBody))
+                    {
+                        LogDebug($"CheckIsCurrentPlayer: TRUE (matched PlayerBody._isYourPlayer on '{playerBody.name}')");
                         return true;
+                    }
                 }
                 catch { }
             }
@@ -744,11 +779,13 @@ namespace HideArmor
                             if (pId.Equals(session.Profile.Id, StringComparison.OrdinalIgnoreCase) ||
                                 pId.Equals(session.Profile.AccountId, StringComparison.OrdinalIgnoreCase))
                             {
+                                LogDebug($"CheckIsCurrentPlayer: TRUE (ProfileId '{pId}' matched backend session Profile/AccountId)");
                                 return true;
                             }
                         }
                         if (!string.IsNullOrEmpty(aId) && aId.Equals(session.Profile.AccountId, StringComparison.OrdinalIgnoreCase))
                         {
+                            LogDebug($"CheckIsCurrentPlayer: TRUE (AccountId '{aId}' matched backend session AccountId)");
                             return true;
                         }
                     }
@@ -756,6 +793,7 @@ namespace HideArmor
             }
             catch { }
 
+            LogDebug($"CheckIsCurrentPlayer: FALSE for '{playerBody.name}'");
             return false;
         }
 
@@ -921,34 +959,65 @@ namespace HideArmor
 
         public static bool ShouldHideSlot(EquipmentSlot slot, Item item, PlayerBody playerBody)
         {
-            if (!ModEnabled.Value) return false;
+            if (!ModEnabled.Value)
+            {
+                LogDebug($"ShouldHideSlot [{slot}]: Mod is disabled -> visible");
+                return false;
+            }
             if (playerBody == null) return false;
 
             bool isCurrentPlayer = CheckIsCurrentPlayer(playerBody);
-            bool isMenu = playerBody.GetComponentInParent<MenuPlayerPoser>() != null || playerBody.GetComponent<MenuPlayerPoser>() != null;
+            bool isMenu = playerBody.GetComponentInParent<MenuPlayerPoser>() != null || playerBody.GetComponent<MenuPlayerPoser>() != null ||
+                          playerBody.GetComponentInParent<EFT.UI.PlayerModelView>() != null || playerBody.GetComponent<EFT.UI.PlayerModelView>() != null;
 
             // Check if this character matches any configured profile in Character List
             var (nickname, profileId, accountId) = GetPlayerIdentity(playerBody);
             var customConfig = FindCharacterConfig(nickname, profileId, accountId);
+
+            string itemName = "None";
+            if (DebugLog != null && DebugLog.Value && item != null)
+            {
+                try
+                {
+                    itemName = item.ShortName ?? item.Name ?? item.TemplateId.ToString();
+                }
+                catch
+                {
+                    itemName = item.GetType().Name;
+                }
+            }
+            bool isArmored = IsArmoredItem(item);
 
             // 1. Current player (local player in raid or menu)
             if (isCurrentPlayer)
             {
                 if (isMenu)
                 {
-                    if (!HideInMenu.Value) return false;
+                    if (!HideInMenu.Value)
+                    {
+                        LogDebug($"ShouldHideSlot [{slot}] on CurrentPlayer (Menu): HideInMenu is false -> visible");
+                        return false;
+                    }
                 }
                 else
                 {
-                    if (!HideForPlayer.Value) return false;
+                    if (!HideForPlayer.Value)
+                    {
+                        LogDebug($"ShouldHideSlot [{slot}] on CurrentPlayer (Raid): HideForPlayer is false -> visible");
+                        return false;
+                    }
                 }
 
                 // If local player was explicitly added to Character List and has a custom profile, use it!
                 if (customConfig != null)
                 {
-                    if (!customConfig.Enabled) return false;
+                    if (!customConfig.Enabled)
+                    {
+                        LogDebug($"ShouldHideSlot [{slot}] on CurrentPlayer '{nickname}': Custom profile Enabled is false -> visible");
+                        return false;
+                    }
 
-                    return CheckSlotRule(slot, item,
+                    bool hide = CheckSlotRule(slot, item,
                         customConfig.HideArmorVest,
                         customConfig.HideArmoredChestRigs,
                         customConfig.HideNonArmoredChestRigs,
@@ -960,10 +1029,13 @@ namespace HideArmor
                         customConfig.HideArmBands,
                         customConfig.HideHolsters,
                         customConfig.HideEarpieces);
+
+                    LogDebug($"ShouldHideSlot [{slot}] on CurrentPlayer '{nickname}' (Custom Profile): Item='{itemName}' (Armored={isArmored}) -> hide={hide}");
+                    return hide;
                 }
 
                 // Default for Current Player: use Section 2 "Equipment Slots (Current Player)"
-                return CheckSlotRule(slot, item,
+                bool defaultHide = CheckSlotRule(slot, item,
                     HideArmorVest.Value,
                     HideArmoredChestRigs.Value,
                     HideNonArmoredChestRigs.Value,
@@ -975,14 +1047,21 @@ namespace HideArmor
                     HideArmBands.Value,
                     HideHolsters.Value,
                     HideEarpieces.Value);
+
+                LogDebug($"ShouldHideSlot [{slot}] on CurrentPlayer '{nickname}' (Section 2 Config): Item='{itemName}' (Armored={isArmored}) -> hide={defaultHide}");
+                return defaultHide;
             }
 
             // 2. Other characters (Bots, bosses, co-op players)
             if (customConfig != null)
             {
-                if (!customConfig.Enabled) return false;
+                if (!customConfig.Enabled)
+                {
+                    LogDebug($"ShouldHideSlot [{slot}] on Other Player/Bot '{nickname}': Custom profile Enabled is false -> visible");
+                    return false;
+                }
 
-                return CheckSlotRule(slot, item,
+                bool hide = CheckSlotRule(slot, item,
                     customConfig.HideArmorVest,
                     customConfig.HideArmoredChestRigs,
                     customConfig.HideNonArmoredChestRigs,
@@ -994,12 +1073,19 @@ namespace HideArmor
                     customConfig.HideArmBands,
                     customConfig.HideHolsters,
                     customConfig.HideEarpieces);
+
+                LogDebug($"ShouldHideSlot [{slot}] on Other Player/Bot '{nickname}' (Custom Profile): Item='{itemName}' (Armored={isArmored}) -> hide={hide}");
+                return hide;
             }
 
             // 3. Fallback for bots not in the character list
-            if (!HideForBots.Value) return false;
+            if (!HideForBots.Value)
+            {
+                LogDebug($"ShouldHideSlot [{slot}] on Other Player/Bot '{nickname}': HideForBots is false -> visible");
+                return false;
+            }
 
-            return CheckSlotRule(slot, item,
+            bool botHide = CheckSlotRule(slot, item,
                 HideArmorVest.Value,
                 HideArmoredChestRigs.Value,
                 HideNonArmoredChestRigs.Value,
@@ -1011,11 +1097,18 @@ namespace HideArmor
                 HideArmBands.Value,
                 HideHolsters.Value,
                 HideEarpieces.Value);
+
+            LogDebug($"ShouldHideSlot [{slot}] on Other Player/Bot '{nickname}' (Section 2 Fallback): Item='{itemName}' (Armored={isArmored}) -> hide={botHide}");
+            return botHide;
         }
 
         public static void SetSlotRenderersEnabled(PlayerBody.SlotView slotView, bool enabled)
         {
             if (slotView == null) return;
+
+            int directCount = 0;
+            int dressCount = 0;
+            int childCount = 0;
 
             // 1. Direct slot renderers
             var renderers = slotView.Renderers;
@@ -1024,9 +1117,13 @@ namespace HideArmor
                 for (int i = 0; i < renderers.Length; i++)
                 {
                     var r = renderers[i];
-                    if (r != null && r.enabled != enabled)
+                    if (r != null)
                     {
-                        r.enabled = enabled;
+                        directCount++;
+                        if (r.enabled != enabled)
+                        {
+                            r.enabled = enabled;
+                        }
                     }
                 }
             }
@@ -1044,9 +1141,13 @@ namespace HideArmor
                         for (int j = 0; j < dress.Renderers.Length; j++)
                         {
                             var r = dress.Renderers[j];
-                            if (r != null && r.enabled != enabled)
+                            if (r != null)
                             {
-                                r.enabled = enabled;
+                                dressCount++;
+                                if (r.enabled != enabled)
+                                {
+                                    r.enabled = enabled;
+                                }
                             }
                         }
                     }
@@ -1056,9 +1157,13 @@ namespace HideArmor
                     {
                         foreach (var r in enumRenderers)
                         {
-                            if (r != null && r.enabled != enabled)
+                            if (r != null)
                             {
-                                r.enabled = enabled;
+                                dressCount++;
+                                if (r.enabled != enabled)
+                                {
+                                    r.enabled = enabled;
+                                }
                             }
                         }
                     }
@@ -1073,11 +1178,20 @@ namespace HideArmor
                 for (int i = 0; i < allRenderers.Length; i++)
                 {
                     var r = allRenderers[i];
-                    if (r != null && r.enabled != enabled)
+                    if (r != null)
                     {
-                        r.enabled = enabled;
+                        childCount++;
+                        if (r.enabled != enabled)
+                        {
+                            r.enabled = enabled;
+                        }
                     }
                 }
+            }
+
+            if (DebugLog != null && DebugLog.Value && (directCount > 0 || dressCount > 0 || childCount > 0))
+            {
+                LogDebug($"SetSlotRenderersEnabled [{slotView.EquipmentSlot}]: Set enabled={enabled} (Direct: {directCount}, Dress: {dressCount}, ModelChildren: {childCount})");
             }
         }
 
@@ -1085,55 +1199,72 @@ namespace HideArmor
         {
             if (slotView == null || playerBody == null) return;
 
-            // Resolve item from all potential sources
-            Item item = slotView._item;
-            if (item == null && slotView._slot != null)
+            try
             {
-                item = slotView._slot.ContainedItem;
-            }
-            if (item == null && slotView.ContainedItem != null)
-            {
-                item = slotView.ContainedItem.Value;
-            }
-            if (item == null && playerBody.Equipment != null)
-            {
-                item = playerBody.Equipment.GetSlot(slotView.EquipmentSlot)?.ContainedItem;
-            }
+                // Resolve item from all potential sources
+                Item item = slotView._item;
+                if (item == null && slotView._slot != null)
+                {
+                    item = slotView._slot.ContainedItem;
+                }
+                if (item == null && slotView.ContainedItem != null)
+                {
+                    item = slotView.ContainedItem.Value;
+                }
+                if (item == null && playerBody.Equipment != null)
+                {
+                    item = playerBody.Equipment.GetSlot(slotView.EquipmentSlot)?.ContainedItem;
+                }
 
-            bool shouldHide = ShouldHideSlot(slotView.EquipmentSlot, item, playerBody);
-            SetSlotRenderersEnabled(slotView, !shouldHide);
+                bool shouldHide = ShouldHideSlot(slotView.EquipmentSlot, item, playerBody);
+                SetSlotRenderersEnabled(slotView, !shouldHide);
+            }
+            catch (Exception ex)
+            {
+                Log?.LogError($"Error in UpdateSlotVisibility [{slotView.EquipmentSlot}]: {ex}");
+            }
         }
 
         public static void ApplyToPlayerBody(PlayerBody body)
         {
             if (body == null || body.SlotViews == null) return;
 
-            if (LogUserInfo.Value)
+            try
             {
-                try
+                var (nick, pId, aId) = GetPlayerIdentity(body);
+                bool isCurrent = CheckIsCurrentPlayer(body);
+
+                if (LogUserInfo.Value)
                 {
-                    var (nick, pId, aId) = GetPlayerIdentity(body);
-                    string key = $"{nick}_{pId}_{aId}";
-                    if (!LoggedIdentities.Contains(key) && (!string.IsNullOrEmpty(nick) || !string.IsNullOrEmpty(pId)))
+                    try
                     {
-                        LoggedIdentities.Add(key);
-                        bool isCurrent = CheckIsCurrentPlayer(body);
-                        var matched = FindCharacterConfig(nick, pId, aId);
-                        string matchInfo = matched != null ? " [Matched Custom Profile]" : "";
-                        Log?.LogInfo($"[HideArmor Character] Nickname: \"{nick}\" | ProfileID: \"{pId}\" | AccountID: \"{aId}\" | IsCurrentPlayer: {isCurrent}{matchInfo}");
+                        string key = $"{nick}_{pId}_{aId}";
+                        if (!LoggedIdentities.Contains(key) && (!string.IsNullOrEmpty(nick) || !string.IsNullOrEmpty(pId)))
+                        {
+                            LoggedIdentities.Add(key);
+                            var matched = FindCharacterConfig(nick, pId, aId);
+                            string matchInfo = matched != null ? " [Matched Custom Profile]" : "";
+                            Log?.LogInfo($"[HideArmor Character] Nickname: \"{nick}\" | ProfileID: \"{pId}\" | AccountID: \"{aId}\" | IsCurrentPlayer: {isCurrent}{matchInfo}");
+                        }
+                    }
+                    catch { }
+                }
+
+                LogDebug($"ApplyToPlayerBody on '{nick}' (Body: '{body.name}', Slots: {body.SlotViews.Count}, IsCurrentPlayer: {isCurrent})");
+
+                int count = body.SlotViews.Count;
+                for (int i = 0; i < count; i++)
+                {
+                    var slotView = body.SlotViews.GetByIndex(i);
+                    if (slotView != null)
+                    {
+                        UpdateSlotVisibility(slotView, body);
                     }
                 }
-                catch { }
             }
-
-            int count = body.SlotViews.Count;
-            for (int i = 0; i < count; i++)
+            catch (Exception ex)
             {
-                var slotView = body.SlotViews.GetByIndex(i);
-                if (slotView != null)
-                {
-                    UpdateSlotVisibility(slotView, body);
-                }
+                Log?.LogError($"Error in ApplyToPlayerBody: {ex}");
             }
         }
 
@@ -1144,6 +1275,7 @@ namespace HideArmor
                 var bodies = FindObjectsOfType<PlayerBody>();
                 if (bodies == null) return;
 
+                LogDebug($"ApplyToAllActiveBodies: found {bodies.Length} PlayerBody instances in scene");
                 for (int i = 0; i < bodies.Length; i++)
                 {
                     ApplyToPlayerBody(bodies[i]);
@@ -1165,6 +1297,7 @@ namespace HideArmor
             try
             {
                 PlayerBody targetBody = playerBody ?? __instance._playerBody;
+                HideArmorPlugin.LogDebug($"CreateAndParentPostfix: slot '{__instance?.EquipmentSlot}' on targetBody '{targetBody?.name}'");
                 HideArmorPlugin.UpdateSlotVisibility(__instance, targetBody);
             }
             catch (Exception ex)
@@ -1182,6 +1315,7 @@ namespace HideArmor
         {
             try
             {
+                HideArmorPlugin.LogDebug($"UpdatePlayerRendersPostfix: body '{__instance?.name}'");
                 HideArmorPlugin.ApplyToPlayerBody(__instance);
             }
             catch (Exception ex)
@@ -1201,6 +1335,7 @@ namespace HideArmor
             {
                 if (__instance != null && __instance.PlayerBody != null)
                 {
+                    HideArmorPlugin.LogDebug($"InitVisualsPostfix: player '{__instance.Profile?.Nickname}'");
                     HideArmorPlugin.ApplyToPlayerBody(__instance.PlayerBody);
                 }
             }
@@ -1218,6 +1353,7 @@ namespace HideArmor
             {
                 if (__instance != null && __instance.PlayerBody != null)
                 {
+                    HideArmorPlugin.LogDebug($"SetPointOfViewPostfix: player '{__instance.Profile?.Nickname}', PointOfView={__instance.PointOfView}");
                     HideArmorPlugin.ApplyToPlayerBody(__instance.PlayerBody);
                 }
             }
@@ -1238,6 +1374,7 @@ namespace HideArmor
             {
                 if (__instance != null && __instance.PlayerBody != null)
                 {
+                    HideArmorPlugin.LogDebug($"PlayerModelView.OnLoadingCompletedPostfix: body '{__instance.PlayerBody.name}'");
                     HideArmorPlugin.ApplyToPlayerBody(__instance.PlayerBody);
                 }
             }
@@ -1258,6 +1395,7 @@ namespace HideArmor
             {
                 if (iPlayer is Player player && player.PlayerBody != null)
                 {
+                    HideArmorPlugin.LogDebug($"GameWorld.RegisterPlayerPostfix: player '{player.Profile?.Nickname}'");
                     HideArmorPlugin.ApplyToPlayerBody(player.PlayerBody);
                 }
             }
